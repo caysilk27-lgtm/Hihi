@@ -11,12 +11,23 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
+      - name: Download Godot
+        run: |
+          wget https://downloads.tuxfamily.org/godotengine/4.2.1/Godot_v4.2.1-stable_linux.x86_64.zip
+          unzip Godot_v4.2.1-stable_linux.x86_64.zip
+          mv Godot_v4.2.1-stable_linux.x86_64 godot
+          chmod +x godot
+
+      - name: Download export templates
+        run: |
+          wget https://downloads.tuxfamily.org/godotengine/4.2.1/Godot_v4.2.1-stable_export_templates.tpz
+          mkdir -p ~/.local/share/godot/export_templates/4.2.1.stable
+          unzip Godot_v4.2.1-stable_export_templates.tpz -d ~/.local/share/godot/export_templates/4.2.1.stable
+
       - name: Export APK
-        uses: nhold/gh-actions-godot-export@v1
-        with:
-          godot-version: '4.2.1'
-          preset: 'Android'
-          output: 'build/OfflineRPG.apk'
+        run: |
+          mkdir -p build
+          ./godot --headless --export-release "Android" build/OfflineRPG.apk
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
