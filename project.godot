@@ -1,0 +1,4 @@
+
+[application]
+config/name="OfflineRPG"
+run/main_scene="res://scenes/Main.tscn"
