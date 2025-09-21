@@ -12,7 +12,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Set up Godot
-        uses: firebelley/setup-godot@v1
+        uses: tzappa/setup-godot@v1
         with:
           godot-version: '4.2.1'
           export-templates: true
@@ -23,7 +23,7 @@ jobs:
           godot --headless --export-release "Android" build/OfflineRPG.apk
 
       - name: Upload APK artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: OfflineRPG-apk
           path: build/OfflineRPG.apk
