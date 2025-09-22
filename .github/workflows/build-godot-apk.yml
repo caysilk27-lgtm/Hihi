@@ -11,32 +11,21 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
+      # Lấy code
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-    - name: Setup Godot (with export templates)
-      uses: barichello/godot-ci@v4
-      with:
-        version: "4.2.2"
+      # Export APK (dùng action firebelley/godot-export)
+      - name: Export Godot Project
+        uses: firebelley/godot-export@v1
+        with:
+          godot-version: "4.2.2"
+          export-preset: "Android"
+          output: build/mygame.apk
 
-    - name: Generate debug.keystore
-      run: |
-        keytool -genkey -v \
-          -keystore debug.keystore \
-          -storepass android \
-          -alias androiddebugkey \
-          -keypass android \
-          -keyalg RSA -keysize 2048 -validity 10000 \
-          -dname "CN=Android Debug,O=Android,C=US"
-
-    - name: Build Android Debug APK
-      run: godot -v --headless --export-debug "Android Debug" build/debug.apk
-
-    - name: Build Android Release APK
-      run: godot -v --headless --export-release "Android Release" build/release.apk
-
-    - name: Upload APKs
-      uses: actions/upload-artifact@v4
-      with:
-        name: APKs
-        path: build/*.apk
+      # Upload APK artifact
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: Android-APK
+          path: build/mygame.apk
