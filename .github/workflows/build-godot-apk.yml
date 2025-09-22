@@ -13,31 +13,28 @@ jobs:
 
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v4
+      uses: actions/checkout@v3
 
-    # Tải Godot
     - name: Download Godot
       run: |
-        wget https://github.com/godotengine/godot/releases/download/4.2.1-stable/Godot_v4.2.1-stable_linux.x86_64.zip
-        unzip Godot_v4.2.1-stable_linux.x86_64.zip
-        mv Godot_v4.2.1-stable_linux.x86_64 godot
+        wget https://github.com/godotengine/godot/releases/download/4.2.1-stable/Godot_v4.2.1-stable_linux.x86_64.zip -O godot.zip
+        unzip godot.zip -d godot
+        chmod +x godot/Godot_v4.2.1-stable_linux.x86_64
+        sudo mv godot/Godot_v4.2.1-stable_linux.x86_64 /usr/local/bin/godot
 
-    # Tải Export Templates
     - name: Download export templates
       run: |
-        wget https://github.com/godotengine/godot/releases/download/4.2.1-stable/Godot_v4.2.1-stable_export_templates.tpz
+        wget https://github.com/godotengine/godot/releases/download/4.2.1-stable/Godot_v4.2.1-stable_export_templates.tpz -O templates.zip
         mkdir -p ~/.local/share/godot/templates/4.2.1.stable
-        tar -xvf Godot_v4.2.1-stable_export_templates.tpz -C ~/.local/share/godot/templates/4.2.1.stable
+        unzip templates.zip -d ~/.local/share/godot/templates/4.2.1.stable
 
-    # Build APK
     - name: Export APK
       run: |
         mkdir -p build
-        ./godot --headless --export-release "Android" build/game.apk
+        godot --headless --export-release "Android" build/game.apk
 
-    # Upload APK
     - name: Upload APK artifact
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v3
       with:
-        name: godot-apk
+        name: game-apk
         path: build/game.apk
