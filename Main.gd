@@ -1,12 +1,11 @@
-
 extends Control
 
-var save_path = "user://savegame.json"
+var save_path := "user://savegame.json"
 
 # ============================
 # Nhân vật
 # ============================
-var player = {
+var player := {
     "name": "Anh Hùng",
     "class": "Warrior",
     "hp": 100,
@@ -29,7 +28,7 @@ var player = {
 # ============================
 # Quái vật & Boss
 # ============================
-var monsters = [
+var monsters := [
     {"name": "Slime", "hp": 20, "atk": 5, "exp": 10, "gold": 5},
     {"name": "Goblin", "hp": 35, "atk": 8, "exp": 20, "gold": 10},
     {"name": "Orc", "hp": 50, "atk": 12, "exp": 35, "gold": 20},
@@ -37,9 +36,9 @@ var monsters = [
 ]
 
 # ============================
-# Trang bị (OM < SOS < SOM < SUM)
+# Trang bị
 # ============================
-var equipment_pool = [
+var equipment_pool := [
     {"name": "OM Sword", "slot": "weapon_main"},
     {"name": "SOS Armor", "slot": "armor_chest"},
     {"name": "SOM Ring", "slot": "ring"},
@@ -49,18 +48,18 @@ var equipment_pool = [
 # ============================
 # Game start
 # ============================
-func _ready():
+func _ready() -> void:
     load_game()
-    $StartButton.connect("pressed", self, "_on_start_pressed")
+    $StartButton.pressed.connect(Callable(self, "_on_start_pressed"))
 
-func _on_start_pressed():
+func _on_start_pressed() -> void:
     fight_monster()
     save_game()  # Lưu sau mỗi trận
 
 # ============================
 # Combat cơ bản
 # ============================
-func fight_monster():
+func fight_monster() -> void:
     var monster = monsters[randi() % monsters.size()]
     print("⚔️ Đụng độ: %s (HP %d)" % [monster["name"], monster["hp"]])
     var monster_hp = monster["hp"]
@@ -82,13 +81,12 @@ func fight_monster():
     print("📊 Trận kết thúc, EXP: %d, Vàng: %d" % [player["exp"], player["gold"]])
 
 # ============================
-# Nhận thưởng sau khi hạ quái
+# Nhận thưởng
 # ============================
-func gain_reward(monster):
+func gain_reward(monster: Dictionary) -> void:
     player["exp"] += monster["exp"]
     player["gold"] += monster["gold"]
 
-    # Tỉ lệ rơi trang bị
     var roll = randi() % 100
     var eq = null
     if roll < 40:
@@ -107,20 +105,21 @@ func gain_reward(monster):
 # ============================
 # SAVE / LOAD
 # ============================
-func save_game():
-    var file = File.new()
-    if file.open(save_path, File.WRITE) == OK:
-        file.store_string(to_json(player))
+func save_game() -> void:
+    var file = FileAccess.open(save_path, FileAccess.WRITE)
+    if file:
+        file.store_string(JSON.stringify(player))
         file.close()
         print("💾 Game đã được lưu.")
 
-func load_game():
-    var file = File.new()
-    if file.file_exists(save_path):
-        if file.open(save_path, File.READ) == OK:
-            var data = parse_json(file.get_as_text())
-            if typeof(data) == TYPE_DICTIONARY:
-                player = data
+func load_game() -> void:
+    if FileAccess.file_exists(save_path):
+        var file = FileAccess.open(save_path, FileAccess.READ)
+        if file:
+            var json_text = file.get_as_text()
+            var result = JSON.parse_string(json_text)
+            if typeof(result) == TYPE_DICTIONARY:
+                player = result
                 print("🔄 Game đã load: LV %d, EXP %d, GOLD %d" %
                       [player["level"], player["exp"], player["gold"]])
             file.close()
