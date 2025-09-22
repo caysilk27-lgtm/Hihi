@@ -1,42 +1,43 @@
-name: Build Godot APK
+name: Build Godot Android APK
 
 on:
   push:
-    branches: [ "main" ]
+    branches:
+      - main
   pull_request:
-    branches: [ "main" ]
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
+      # Lấy source code
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v3
 
-      # Tải Godot (headless) từ GitHub Releases
-      - name: Download Godot 4.2.2 (Linux headless)
-        run: |
-          wget https://github.com/godotengine/godot/releases/download/4.2.2-stable/Godot_v4.2.2-stable_linux.x86_64.zip -O godot.zip
-          unzip godot.zip -d godot-bin
-          mv godot-bin/Godot_v4.2.2-stable_linux.x86_64 godot
-          chmod +x godot
-
-      # Tải Export Templates
-      - name: Download Export Templates
-        run: |
-          wget https://github.com/godotengine/godot/releases/download/4.2.2-stable/Godot_v4.2.2-stable_export_templates.tpz -O templates.tpz
-          mkdir -p ~/.local/share/godot/templates/4.2.2.stable
-          unzip -q templates.tpz -d ~/.local/share/godot/templates/4.2.2.stable
-
-      # Build APK
-      - name: Build Android Release APK
-        run: |
-          ./godot --headless --verbose --export-release "Android" build.apk
-
-      # Upload APK artifact (sửa sang v4)
-      - name: Upload APK
-        uses: actions/upload-artifact@v4
+      # Cài Godot
+      - name: Setup Godot
+        uses: firebelley/setup-godot@v2
         with:
-          name: Android-APK
-          path: build.apk
+          godot-version: 4.2.2
+          use-dotnet: false
+          include-templates: true
+
+      # Tạo thư mục build
+      - name: Create build directory
+        run: mkdir -p build/android
+
+      # Build Debug APK
+      - name: Build Android Debug
+        run: godot --headless --export-debug "Android Debug" build/android/game-debug.apk
+
+      # Build Release APK
+      - name: Build Android Release
+        run: godot --headless --export-release "Android Release" build/android/game-release.apk
+
+      # Upload artifacts để tải về
+      - name: Upload APKs
+        uses: actions/upload-artifact@v3
+        with:
+          name: android-apks
+          path: build/android/*.apk
