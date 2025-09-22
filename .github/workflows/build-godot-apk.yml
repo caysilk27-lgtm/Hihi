@@ -14,16 +14,23 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Godot
-        uses: nhannht/setup-godot@v1
-        with:
-          version: 4.2.2
-          use-dotnet: false
+      - name: Download Godot 4.2.2 (Linux headless)
+        run: |
+          wget https://downloads.tuxfamily.org/godotengine/4.2.2/mono/Godot_v4.2.2-stable_linux.x86_64.zip -O godot.zip
+          unzip godot.zip -d godot-bin
+          mv godot-bin/Godot_v4.2.2-stable_linux.x86_64 godot
+          chmod +x godot
 
-      - name: Export Android (Release)
+      - name: Download Export Templates
+        run: |
+          wget https://downloads.tuxfamily.org/godotengine/4.2.2/mono/Godot_v4.2.2-stable_export_templates.tpz -O templates.tpz
+          mkdir -p ~/.local/share/godot/templates/4.2.2.stable
+          unzip -q templates.tpz -d ~/.local/share/godot/templates/4.2.2.stable
+
+      - name: Build Android Release APK
         run: |
           mkdir -p build
-          godot --headless --verbose --export-release "Android Release" build/game.apk
+          ./godot --headless --export-release "Android" build/game.apk
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
