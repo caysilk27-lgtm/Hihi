@@ -11,21 +11,25 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Lấy code
+      # Lấy code về
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # Export APK (dùng action firebelley/godot-export)
+      # Export APK (Debug + Release)
       - name: Export Godot Project
-        uses: firebelley/godot-export@v1
+        uses: firebelley/godot-export@v7.0.0
         with:
-          godot-version: "4.2.2"
-          export-preset: "Android"
-          output: build/mygame.apk
+          godot_executable_download_url: https://downloads.tuxfamily.org/godotengine/4.2.2-stable/Godot_v4.2.2-stable_linux.x86_64.zip
+          godot_export_templates_download_url: https://downloads.tuxfamily.org/godotengine/4.2.2-stable/Godot_v4.2.2-stable_export_templates.tpz
+          relative_project_path: ./
+          export_debug: true
+          export_release: true
+          use_preset_export_path: true
+          verbose: true
 
-      # Upload APK artifact
-      - name: Upload APK
+      # Upload cả Debug + Release APK
+      - name: Upload APKs
         uses: actions/upload-artifact@v4
         with:
-          name: Android-APK
-          path: build/mygame.apk
+          name: Android-APKs
+          path: build/*.apk
