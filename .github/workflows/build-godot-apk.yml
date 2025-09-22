@@ -1,4 +1,4 @@
-name: Build Godot APK
+name: Build Godot Android APK
 
 on:
   push:
@@ -10,33 +10,19 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
+    container:
+      image: barichello/godot-ci:4.2.2
+
     steps:
-      - name: Checkout repository
+      - name: Checkout
         uses: actions/checkout@v4
 
-      # Tải Godot (headless)
-      - name: Download Godot 4.2.2 (Linux headless)
-        run: |
-          wget https://github.com/godotengine/godot/releases/download/4.2.2-stable/Godot_v4.2.2-stable_linux.x86_64.zip -O godot.zip
-          unzip godot.zip -d godot-bin
-          mv godot-bin/Godot_v4.2.2-stable_linux.x86_64 godot
-          chmod +x godot
-
-      # Tải Export Templates
-      - name: Download Export Templates
-        run: |
-          wget https://github.com/godotengine/godot/releases/download/4.2.2-stable/Godot_v4.2.2-stable_export_templates.tpz -O templates.tpz
-          mkdir -p ~/.local/share/godot/templates/4.2.2.stable
-          unzip -q templates.tpz -d ~/.local/share/godot/templates/4.2.2.stable
-
-      # Build APK (sử dụng preset "Android Release")
-      - name: Build Android Release APK
+      - name: Build Android Release
         run: |
           mkdir -p build/android
-          ./godot --headless --verbose --export-release "Android Release" build/android/game-release.apk
+          godot --headless --verbose --export-release "Android" build/android/game-release.apk
 
-      # Upload APK artifact
-      - name: Upload APK
+      - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: Android-APK
