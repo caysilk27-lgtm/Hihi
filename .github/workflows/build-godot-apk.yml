@@ -2,42 +2,29 @@ name: Build Godot Android APK
 
 on:
   push:
-    branches:
-      - main
+    branches: [ "main" ]
   pull_request:
+    branches: [ "main" ]
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      # Lấy source code
-      - name: Checkout repository
-        uses: actions/checkout@v3
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      # Cài Godot
       - name: Setup Godot
-        uses: firebelley/setup-godot@v2
+        uses: gosu/godot-export@v6
         with:
           godot-version: 4.2.2
-          use-dotnet: false
-          include-templates: true
+          export-templates-version: 4.2.2
 
-      # Tạo thư mục build
-      - name: Create build directory
-        run: mkdir -p build/android
+      - name: Build Android Debug APK
+        run: godot --headless --verbose --export-debug "Android Debug" build/android/game-debug.apk
 
-      # Build Debug APK
-      - name: Build Android Debug
-        run: godot --headless --export-debug "Android Debug" build/android/game-debug.apk
-
-      # Build Release APK
-      - name: Build Android Release
-        run: godot --headless --export-release "Android Release" build/android/game-release.apk
-
-      # Upload artifacts để tải về
-      - name: Upload APKs
-        uses: actions/upload-artifact@v3
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
         with:
-          name: android-apks
-          path: build/android/*.apk
+          name: game-debug-apk
+          path: build/android/game-debug.apk
