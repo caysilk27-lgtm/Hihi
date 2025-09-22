@@ -34,9 +34,9 @@ jobs:
         run: |
           ./godot --headless --verbose --export-release "Android" build.apk
 
-      # Upload APK làm artifact để tải về
+      # Upload APK artifact (sửa sang v4)
       - name: Upload APK
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: Android-APK
           path: build.apk
